@@ -1,0 +1,89 @@
+<% CovenantVO cov = (CovenantVO) iFlowVO.getPresentationObject(COVENA_EditTerm_PostHandler.PO_TERM); %>
+<% LinkedHashMap<String, String> agreementMap = (LinkedHashMap<String, String>) iFlowVO.getPresentationObject(COVENA_EditTerm_PostHandler.PO_PRODUCTS); %>
+
+<script type="text/javascript">
+
+<!--
+
+function initHtmlControls() {
+	var fReadOnly = <%=!(cov.isChangeable() && cov.isAddedInSpecifiedPeriod()) %>;	
+	var ta = document.getElementsByTagName("textarea");
+	for (var i = 0; i < ta.length; i++) {
+		ta[i].readOnly = fReadOnly;
+	}
+}
+
+-->
+
+
+</script>
+
+<body  onload="initHtmlControls();">
+<div class="detailedCovenantHead">
+    <%=Messages.getString("COVENA.LABELS.TERMS.PRODUCT_SPECIFIC_RISK_TERMS", locale)%>
+</div>
+
+<br><br>
+
+<table class="detailedCovenantTable">
+	<tr>
+        <td>
+            <co:if expression="<%=cov.isChangeable() && cov.isAddedInSpecifiedPeriod()%>">
+                <label for="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT%>"><%=Messages.getString("COVENA.LABELS.TERMS.CHOOSE_PRODUCT", locale)%></label>
+                &nbsp;&nbsp;&nbsp;
+                <wf:select id="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT%>" name="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT%>" mapName="<%=COVENA_EditTerm_PostHandler.PO_PRODUCTS%>" firstRow="&nbsp;" style="selectStyle" />
+            </co:if>
+            <co:if expression="<%=!cov.isChangeable() || !cov.isAddedInSpecifiedPeriod()%>">
+                <label><%=Messages.getString("COVENA.LABELS.TERMS.PRODUCT", locale)%></label>
+                :&nbsp;
+                <%=agreementMap.get("" + cov.getAgreementId())%>
+            </co:if>
+        </td>
+		<td>
+			<co:if expression="<%=cov.isAddedInCurrentSession()%>">
+                <co:if expression="<%=cov.getTermAfterDiscounting()%>">
+	                <label for="<%=COVENA_EditTerm_PostHandler.RP_DUE_DATE%>"><%=Messages.getString("COVENA.LABELS.COMMON.DUE_DATE", locale)%></label>
+	                &nbsp;&nbsp;&nbsp;
+	                <wf:input name="<%=COVENA_EditTerm_PostHandler.RP_DUE_DATE%>" id="<%=COVENA_EditTerm_PostHandler.RP_DUE_DATE%>" style="date" type="date" disabled="<%=\"\" + !cov.getTermAfterDiscounting().booleanValue()%>" caption="<%=Messages.getString(\"COVENA.LABELS.COMMON.DUE_DATE\", locale)%>" />
+                </co:if>
+                <co:if expression="<%=!cov.getTermAfterDiscounting()%>">
+					<%=Messages.getString("COVENA.LABELS.TERMS.DUE_DATE_AT_DISBURSEMENT", locale)%>	
+                </co:if>
+            </co:if>
+            <co:if expression="<%=!cov.isAddedInCurrentSession()%>">
+                <co:if expression="<%=cov.getTermAfterDiscounting()%>">
+                	<label for="<%=COVENA_EditTerm_PostHandler.RP_DUE_DATE%>"><%=Messages.getString("COVENA.LABELS.COMMON.DUE_DATE", locale)%></label>
+                	:&nbsp;
+                	<%=(cov.getDueDate() != null ? WFFormatter.dateToString(cov.getDueDate().getTime()) : "")%>
+                </co:if>
+                <co:if expression="<%=!cov.getTermAfterDiscounting()%>">
+                    <%=Messages.getString("COVENA.LABELS.TERMS.DUE_DATE_AT_DISBURSEMENT", locale)%>
+                </co:if>
+            </co:if>				
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label for="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT_SPECIFIC_RISK%>"><%=Messages.getString("COVENA.LABELS.TERMS.PRODUCT_SPECIFIC_RISK_NOTE", locale)%></label>
+            <wf:textarea name="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT_SPECIFIC_RISK%>" id="<%=COVENA_EditTerm_PostHandler.RP_PRODUCT_SPECIFIC_RISK%>" 
+            	cols="1" rows="1" maxlength="2000"></wf:textarea>
+		</td>
+		<td>
+			<label for="<%=COVENA_EditTerm_PostHandler.RP_COMPANY_ACTION_REDUCING_RISK%>"><%=Messages.getString("COVENA.LABELS.TERMS.COMPANY_ACTION_REDUCING_RISK_NOTE", locale)%></label>
+            <wf:textarea name="<%=COVENA_EditTerm_PostHandler.RP_COMPANY_ACTION_REDUCING_RISK%>" id="<%=COVENA_EditTerm_PostHandler.RP_COMPANY_ACTION_REDUCING_RISK%>"
+            	cols="1" rows="1" maxlength="2000"></wf:textarea>
+		</td>
+	</tr>
+	<tr>
+		<td>
+            <label for="<%=COVENA_EditTerm_PostHandler.RP_MEASURABLE_CONDITION_GIVEN_RISK%>"><%=Messages.getString("COVENA.LABELS.TERMS.MEASURABLE_CONDITION_GIVEN_RISK_NOTE", locale)%></label>
+            <wf:textarea name="<%=COVENA_EditTerm_PostHandler.RP_MEASURABLE_CONDITION_GIVEN_RISK%>" id="<%=COVENA_EditTerm_PostHandler.RP_MEASURABLE_CONDITION_GIVEN_RISK%>" 
+            	cols="1" rows="1" maxlength="4000"></wf:textarea>
+		</td>
+		<td>
+            <label for="<%=COVENA_EditTerm_PostHandler.RP_COVENANT_OFFER_LETTER%>"><%=Messages.getString("COVENA.LABELS.TERMS.COVENANT_OFFER_LETTER_NOTE", locale)%></label>
+            <wf:textarea name="<%=COVENA_EditTerm_PostHandler.RP_COVENANT_OFFER_LETTER%>" id="<%=COVENA_EditTerm_PostHandler.RP_COVENANT_OFFER_LETTER%>"
+            	cols="1" rows="1" maxlength="4000"></wf:textarea>				
+		</td>
+	</tr>
+</table>
