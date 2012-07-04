@@ -186,7 +186,7 @@ public void setCharacterEncoding(String encoding){
 
 @Override
 public RequestDispatcher getRequestDispatcher(String path){
-  path = dispatcherPath;  
+    
   return new RequestDispatcherImpl(path);
 }
 

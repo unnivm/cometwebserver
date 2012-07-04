@@ -66,5 +66,8 @@ import java.util.List;
        return null;
    }
    
+   public static String getDecodedString(String s){
+       return java.net.URLDecoder.decode(s);
+   }
  }
 

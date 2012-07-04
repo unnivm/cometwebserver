@@ -8,6 +8,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +25,8 @@ public class Test {
     private static int cnt;
     
     public static void main(String []arg){
+        String ff = "/unni/servlets/servlet/SessionExample%3Fdataname%3Dfoo%26datavalue%3Dbar";
+        System.out.println(" encode "+URLDecoder.decode(ff));
         String s ="";
         s+="GET /unni/servlets/images/return.gif HTTP/1.1\r\n"+
 "Host: localhost:8700\r\n"+

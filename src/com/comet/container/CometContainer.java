@@ -77,9 +77,12 @@ import java.util.zip.InflaterInputStream;
           
           private String currDir = System.getProperty("user.dir") + File.separator + Constants.application;
 	 
-          public CometContainer(HttpRequestManager httpRequestManager,CometState cometState){
+          private ContainerContext containerContext;
+          
+          public CometContainer(HttpRequestManager httpRequestManager,CometState cometState, ContainerContext containerContext){
 	    this.httpRequestManager = httpRequestManager;
             this.cometState = cometState;
+            this.containerContext = containerContext;
 	    init();
             CometShutdown csd = new CometShutdown(this);
             Runtime.getRuntime().addShutdownHook(csd);
@@ -89,6 +92,7 @@ import java.util.zip.InflaterInputStream;
           }
           
    public  Object loadHttpServlet(String servlet){
+    /* 
     try{
 			    Object  object2  =  ClassLoader.getSystemClassLoader().loadClass("com.servlet.test."+servlet).newInstance();
 				Method [] methods = object2.getClass().getDeclaredMethods();
@@ -99,14 +103,20 @@ import java.util.zip.InflaterInputStream;
 				result = methods[0].invoke(object2, obj1);
 			  }catch(Exception e){
 			  }
-			  return result;
+    */
+       System.out.println(" CCCC ");
+       WebResource resource = httpRequestManager.getResource();
+       System.out.println(" DDDCCCC ");
+       resource.setResource(servlet);
+       loadHttpServlet(true);                      
+       return result;
     }
 
-  public Object processContent(){
+  public Object processContent(boolean dispatch){
      CharSequence strContent = null;
      StringBuilder sb = new StringBuilder();
      HttpHeader hh    = new HttpHeader();
-     if(loadHttpServlet()){
+     if(loadHttpServlet(dispatch)){
         strContent = httpServletResponseImpl.getData();
         if(getRequest().getSessionCookie() != null) {
            System.out.println(" what is the cookie value coming here " + getRequest().getSessionCookie().getValue()); 
@@ -151,17 +161,17 @@ import java.util.zip.InflaterInputStream;
         return sb; 
   }
     
-    public boolean loadHttpServlet(){
+    public boolean loadHttpServlet(boolean dispatch){
         WebResource resource = httpRequestManager.getResource();
+        if(resource == null) return false;
         String servlet       = null;
-        Class clazz          = null;
         boolean isValid      = resource.processForValidResource(servlet);
         if(!isValid){
            return false;
         }
+        Class clazz          = null;
         servlet = resource.getResourceValue();
         String path = resource.getResourcePath();
-       //logger.log(Level.INFO, " what is the loading servlet .... {0}", servlet);
         try {
                 if (file == null){
                     file = new File(path);
@@ -180,8 +190,10 @@ import java.util.zip.InflaterInputStream;
                 }
                 Object object2 = clazz.newInstance();
                 Method[] methods = object2.getClass().getDeclaredMethods();
+                if(!dispatch){
                 httpServletResponseImpl = new HttpServletResponseImpl(getResponse());
                 httpServletRequestImpl  = new HttpServletRequestImpl(getRequest(), contentBuffer);
+                }
                 Object[] arguement = new Object[2];
                 arguement[0] = httpServletRequestImpl;
                 arguement[1] = httpServletResponseImpl;
@@ -270,9 +282,13 @@ import java.util.zip.InflaterInputStream;
       for(Application apps:appList){
              if(apps !=null) {
 		try {
-                    File f = new File(projectPath + "\\" + apps.getName() + "\\WEB-INF\\"+apps.getWebxml()); 
+                    //File.separator
+                    //File f = new File(projectPath + "\\" + apps.getName() + "\\WEB-INF\\"+apps.getWebxml()); 
+                    File f = new File(projectPath + File.separator + apps.getName() + File.separator+"WEB-INF"+File.separator + apps.getWebxml()); 
+                    System.out.println("f.getName() "+ f.getName());
                     if(f.exists()){
                        pathToWebXML = f.getCanonicalPath();
+                       System.out.println("pathToWebXML "+ pathToWebXML);
 		       FileInputStream fis = new FileInputStream(pathToWebXML);
 		       doclist.add(XMLUtil.loadXML(fis));
                     }
@@ -284,10 +300,11 @@ import java.util.zip.InflaterInputStream;
 	  }
       } 
        System.out.println(" doclist " + doclist);
-       if(doclist.size()>=1){
+       if(doclist == null || doclist.size()<=0) return;
+//       if(doclist.size()>=1){
 	 parsewebDotXML(doclist);
          System.out.println( "project map: " + projectmap);
-       }
+ //      }
        
   }
   
@@ -329,10 +346,10 @@ import java.util.zip.InflaterInputStream;
 		  projectmap.put(app.getName(), xml);
 		  appsize++;
 	  }
-          ContainerContext cc = new ContainerContext();
-          cc.setProjectMap(projectmap);
+          containerContext.setProjectMap(projectmap);
+          containerContext.setContainer(this);
           if(httpRequestManager != null)
-          httpRequestManager.setContainerContext(cc);
+          httpRequestManager.setContainerContext(containerContext);
   }
   
 	
@@ -396,8 +413,10 @@ import java.util.zip.InflaterInputStream;
   if(file.isDirectory()){
       if(currDir.equals(file.getParent())){
           System.out.println("[DIR] "  + file.getName());
+          if(!file.getName().contains(".svn")){
           app = new Application();
           appName =  file.getName();
+          }
        }
   }else if(file.isFile()){
        if(webxml.equals(file.getName())){

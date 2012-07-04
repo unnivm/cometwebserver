@@ -1,5 +1,6 @@
 
 import com.comet.container.CometContainer;
+import com.comet.container.ContainerContext;
 import com.comet.core.CometState;
 import com.comet.server.http.Constants;
 import com.comet.server.http.HttpHeader;
@@ -22,7 +23,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -41,15 +41,17 @@ public class NonblockingSingleFileHTTPServer {
     private CometContainer container = null;
     private static final Logger logger = Logger.getLogger(NonblockingSingleFileHTTPServer.class.getName());
     private CometState cometState;
-    
-    private NonblockingSingleFileHTTPServer(int port) {
+    private ContainerContext containerContext = ContainerContext.getContainerContext();
+    private boolean dispatch = false;
+            
+    private NonblockingSingleFileHTTPServer(int port){
         this.port = port;
         initializeContainer();
     }
 
     private void initializeContainer(){
       cometState = CometState.getCometState();  
-      container = new CometContainer(httpRequestManager,cometState);
+      container = new CometContainer(httpRequestManager,cometState,containerContext);
     }
 
     private void run() throws IOException {
@@ -140,7 +142,7 @@ public class NonblockingSingleFileHTTPServer {
     }
     
     private void processContentWithContext() throws IOException{
-        Object obj = container.processContent();
+        Object obj = container.processContent(dispatch);
         if( obj instanceof StringBuilder){
             setContentBuffer((StringBuilder)obj);
             return;
@@ -162,14 +164,10 @@ public class NonblockingSingleFileHTTPServer {
         request    = new Request();
         request.setCometState(cometState);
         response   = new Response();
-        long start = System.currentTimeMillis();
         httpRequestManager.processHeaderDataFromRequest(buffer, request, response, channel);
         container.setRequest(request);
         container.setResponse(response);
         container.setContentBuffer(buffer);
-        long end = System.currentTimeMillis();
-//      System.out.println("--time taken to process processHeaderDataFromRequest1 " + (end - start));
-        //System.out.println("...httpRequestManager.isContextPath()... " + httpRequestManager.isContextPath());
         if (httpRequestManager.isContextPath()){
             processContentWithContext();
             return;

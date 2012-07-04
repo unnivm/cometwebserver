@@ -5,6 +5,7 @@
 package com.comet.servlet.impl;
 
 import com.comet.container.CometContainer;
+import com.comet.container.ContainerContext;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
@@ -47,29 +48,37 @@ import javax.servlet.ServletResponse;
     private String path;
 	
  public RequestDispatcherImpl(String path) {
+     System.out.println("...inside RequestDispatcherImpl() ");
     this.path = path;
  }
 	
 	
 @Override
- public void forward(ServletRequest request, ServletResponse response) throws IOException {
-/*
+public void forward(ServletRequest request, ServletResponse response) throws IOException{
+
+    /*
     try {
 			CometContainer cometContainer = new CometContainer();
 			cometContainer.setHttpServletRequestImpl((HttpServletRequestImpl)request);
 			cometContainer.setHttpServletResponseImpl((HttpServletResponseImpl)response);
 			cometContainer.loadHttpServlet(path);
-		} catch (Exception e) {
-		}
-                * 
-                */
-    // need to send a 302 signal back to browser
-    HttpServletResponseImpl responseImpl = (HttpServletResponseImpl) response;
-    if(responseImpl != null)
-    responseImpl.setForward(true,path);
+	}catch (Exception e){
+            
+	}
+        * 
+        */
+    System.out.println("...inside forward().....");
+    CometContainer container = ContainerContext.getContainerContext().getContainer();
+    System.out.println(" container " + container);
+    if(container == null) return;
+    System.out.println(" AAAAAA " + container);
+    container.setHttpServletRequestImpl((HttpServletRequestImpl)request);
+    container.setHttpServletResponseImpl((HttpServletResponseImpl)response);
+    System.out.println(" BBBBBBBB " + container);
+    container.loadHttpServlet(path);
  }
 
-    @Override
+ @Override
  public void include(ServletRequest request, ServletResponse response) {
 		try {
 			CometContainer cometContainer = new CometContainer();

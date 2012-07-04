@@ -4,7 +4,7 @@
  */
 package javax.servlet.http;
 
- import java.io.IOException;
+import java.io.IOException;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletException;
 
@@ -13,4 +13,8 @@ import javax.servlet.ServletException;
 	 protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException,ServletException {
 		 System.out.println("doGet() method  of HttpServlet was called.... ");
 	 }
+         
+         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException,ServletException {
+             
+         }
  }

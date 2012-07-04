@@ -8,6 +8,7 @@ import com.comet.container.ContainerContext;
 import com.comet.servlet.impl.Request;
 import com.comet.servlet.impl.Response;
 import com.comet.utils.HttpUtils;
+import com.comet.utils.StringUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -69,6 +70,7 @@ import java.util.logging.Logger;
       try{
         cb = decoder.decode(buffer);
         reqStr = cb.toString();
+        reqStr =StringUtils.getDecodedString(reqStr);
         logger.log(Level.INFO, " header data {0}", reqStr);
       }catch (CharacterCodingException ex){
         Logger.getLogger(HttpRequestManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -222,6 +224,7 @@ private void setRemoteAddress(final Request request,final SocketChannel channel)
       }
      }
      request.setParameter(requestMap);
+     System.out.println(" request map " + requestMap);
      Set keys = requestMap.keySet();
      request.setParameterNames(new Vector(keys).elements());
   }

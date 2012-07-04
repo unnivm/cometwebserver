@@ -12,6 +12,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class RequestParamExample extends HttpServlet {
     throws IOException, ServletException
     {
         response.setContentType("text/html");
+        
         PrintWriter out = response.getWriter();
         out.println("<html>");
         out.println("<head>");
@@ -72,9 +74,13 @@ public class RequestParamExample extends HttpServlet {
         out.println("</form>");
         out.println("</body>");
         out.println("</html>");
+        request.setAttribute("dispatcher", "/servlets/servlet/Cooker");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/servlets/servlet/Cooker");
+        dispatcher.forward(request, response);
     }
 
     
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse res)
     throws IOException, ServletException
     {

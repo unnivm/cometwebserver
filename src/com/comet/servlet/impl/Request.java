@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.Map.Entry;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
@@ -111,7 +112,7 @@ import javax.servlet.http.HttpSession;
 	}
 	
 	public final void setAttribute(final String key, final Object value) {
-	  requestObjMap.put(key, value);
+	  requestObjMap.put(key.trim(), value);
 	}
 	
 	public final Object getAttribute(final String key) {
@@ -497,7 +498,6 @@ public HttpSession getSession1(){
                 sc = cometState.getSerialializedContext();
                 if(sc != null)
                 session = sc.getSession();
-                //System.out.println(" A SESSION " + session);
                 if(session != null && session.getId().equals(c.getValue())){
                  isSessionCreated = true;
                  session.setCometState(cometState);
@@ -508,8 +508,6 @@ public HttpSession getSession1(){
             if(sc != null){
                session = sc.getSession();
                isSessionCreated = true;
-               //System.out.println(" B SESSION " + session);
-             //  saveSession();
                session.setCometState(cometState);
                return session;
             }
@@ -521,8 +519,6 @@ public HttpSession getSession1(){
      sc.setCometState(cometState);
      sc.setContext(context);
      session = sc.getSession();
-     //cometState.store(context, ByteBuffer.wrap(CometUtil.getCompressedSession(sc)));
-     //saveSession();
    }
    return session;
 }
