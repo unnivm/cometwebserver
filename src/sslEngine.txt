@@ -1,0 +1,15 @@
+//http://forums.devarticles.com/java-development-38/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure-11809.html
+char []passwKey = "Your_password".toCharArray();
+KeyStore ts = KeyStore.getInstance("PKCS12");
+ts.load(new FileInputStream("Path_to_the_file"), passwKey);
+KeyManagerFactory tmf = KeyManagerFactory.getInstance("SunX509");
+tmf.init(ts,passwKey);
+SSLContext sslContext = SSLContext.getInstance("TLS");
+sslContext.init(tmf.getKeyManagers(), null, null);
+SSLSocketFactory factory =sslContext.getSocketFactory();
+HttpsURLConnection.setDefaultSSLSocketFactory(fact ory);
+SSLSocket socket = (SSLSocket) factory.createSocket(host,Port); // Create the ServerSocket
+String[] suites = socket.getSupportedCipherSuites();
+socket.setEnabledCipherSuites(suites);
+//start handshake
+socket.startHandshake();
